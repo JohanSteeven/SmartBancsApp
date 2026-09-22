@@ -58,18 +58,18 @@ public class TransferService {
 
     public TransferResponse executeTransfer(String idempotencyKey, TransferRequest request) {
         long startTime = System.currentTimeMillis();
-        try {
-            if (idempotencyKey == null || idempotencyKey.isBlank()) {
-                throw new IllegalArgumentException("El header Idempotency-Key es obligatorio");
-            }
 
-            // 1. Verificación previa de idempotencia (Fast path)
-            Optional<Transaction> existingTransaction = idempotencyRepository.findTransactionByKey(idempotencyKey);
-            if (existingTransaction.isPresent()) {
-                log.info("Solicitud idempotente detectada para clave {}. Retornando transacción existente {}", idempotencyKey, existingTransaction.get().id());
-                metrics.registerIdempotentResponse();
-                return TransferResponse.from(existingTransaction.get(), true);
-            }
+        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+            throw new IllegalArgumentException("El header Idempotency-Key es obligatorio");
+        }
+
+        // 1. Verificación previa de idempotencia (Fast path)
+        Optional<Transaction> existingTransaction = idempotencyRepository.findTransactionByKey(idempotencyKey);
+        if (existingTransaction.isPresent()) {
+            log.info("Solicitud idempotente detectada para clave {}. Retornando transacción existente {}", idempotencyKey, existingTransaction.get().id());
+            metrics.registerIdempotentResponse();
+            return TransferResponse.from(existingTransaction.get(), true);
+        }
 
         if (request.sourceAccountId().equals(request.destinationAccountId())) {
             throw new SameAccountTransferException("La cuenta de origen y destino no pueden ser la misma");
@@ -81,7 +81,9 @@ public class TransferService {
         while (true) {
             attempts++;
             try {
-                return performAtomicTransfer(idempotencyKey, request);
+                TransferResponse response = performAtomicTransfer(idempotencyKey, request);
+                metrics.recordTransferDuration(System.currentTimeMillis() - startTime);
+                return response;
             } catch (CannotAcquireLockException | DeadlockLoserDataAccessException e) {
                 if (attempts >= maxRetries) {
                     log.error("Excedido el número máximo de reintentos por bloqueo concurrente para transferencia de {}", request.sourceAccountId(), e);
@@ -148,7 +150,6 @@ public class TransferService {
                 transactionId, sourceAccount.id(), destinationAccount.id(), request.amount(), request.currency());
 
             metrics.registerSuccessfulTransfer();
-            metrics.recordTransferDuration(System.currentTimeMillis() - startTime);
 
             return TransferResponse.from(transaction, false);
         });

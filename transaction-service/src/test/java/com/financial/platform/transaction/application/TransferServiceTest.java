@@ -3,7 +3,6 @@ package com.financial.platform.transaction.application;
 import com.financial.platform.transaction.api.TransferRequest;
 import com.financial.platform.transaction.api.TransferResponse;
 import com.financial.platform.transaction.domain.Account;
-import com.financial.platform.transaction.domain.InsufficientBalanceException;
 import com.financial.platform.transaction.domain.SameAccountTransferException;
 import com.financial.platform.transaction.domain.Transaction;
 import com.financial.platform.transaction.domain.TransactionStatus;
@@ -12,13 +11,13 @@ import com.financial.platform.transaction.infrastructure.IdempotencyRepository;
 import com.financial.platform.transaction.infrastructure.LedgerJdbcRepository;
 import com.financial.platform.transaction.infrastructure.OutboxJdbcRepository;
 import com.financial.platform.transaction.infrastructure.TransactionJdbcRepository;
+import com.financial.platform.shared.observability.TransactionMetrics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.TransactionStatus as SpringTxStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -48,6 +47,8 @@ class TransferServiceTest {
     private OutboxJdbcRepository outboxRepository;
     @Mock
     private IdempotencyRepository idempotencyRepository;
+    @Mock
+    private TransactionMetrics metrics;
 
     private TransferService transferService;
 
@@ -62,7 +63,8 @@ class TransferServiceTest {
             transactionRepository,
             ledgerRepository,
             outboxRepository,
-            idempotencyRepository
+            idempotencyRepository,
+            metrics
         );
     }
 
@@ -84,6 +86,7 @@ class TransferServiceTest {
         assertThat(response.isIdempotentResponse()).isTrue();
         assertThat(response.transactionId()).isEqualTo(existing.id());
         verifyNoInteractions(accountRepository, transactionTemplate);
+        verify(metrics).registerIdempotentResponse();
     }
 
     @Test
@@ -114,7 +117,7 @@ class TransferServiceTest {
         // Simula la ejecución sincrónica de transactionTemplate.execute()
         when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
             TransactionCallback<TransferResponse> callback = invocation.getArgument(0);
-            return callback.doInTransaction(mock(SpringTxStatus.class));
+            return callback.doInTransaction(mock(org.springframework.transaction.TransactionStatus.class));
         });
 
         when(accountRepository.lockAccountsInStableOrder(sourceId, destId))
@@ -134,5 +137,6 @@ class TransferServiceTest {
         verify(ledgerRepository).createCredit(any(), eq(destId), eq(new BigDecimal("200.00")));
         verify(outboxRepository).storeTransactionCompletedEvent(createdTx);
         verify(idempotencyRepository).save(key, createdTx.id());
+        verify(metrics).registerSuccessfulTransfer();
     }
 }

@@ -1,5 +1,6 @@
 package com.financial.platform.ai.application;
 
+import com.financial.platform.ai.infrastructure.RecommendationJdbcRepository;
 import com.financial.platform.shared.observability.TransactionMetrics;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
