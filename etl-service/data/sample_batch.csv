@@ -1,0 +1,7 @@
+transaction_id,source_account_id,destination_account_id,amount,currency,timestamp
+a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22,100.50,USD,2026-09-22T10:00:00Z
+b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a22,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33,250.00,USD,2026-09-22T10:05:00Z
+INVALID-UUID-123,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22,50.00,USD,2026-09-22T10:10:00Z
+c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a33,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22,-75.00,USD,2026-09-22T10:15:00Z
+d4eebc99-9c0b-4ef8-bb6d-6bb9bd380a44,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22,300.00,INVALID_CURR,2026-09-22T10:20:00Z
+e5eebc99-9c0b-4ef8-bb6d-6bb9bd380a55,,b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22,120.00,USD,2026-09-22T10:25:00Z
