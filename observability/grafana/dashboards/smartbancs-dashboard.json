@@ -1,0 +1,108 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Transferencias por Estado (Completadas vs Rechazadas vs Idempotentes)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "targets": [
+        {
+          "expr": "sum(rate(financial_transactions_total[1m])) by (status)",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    },
+    {
+      "title": "Latencia p50 / p95 / p99 en Ejecución de Transferencias",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.3 },
+              { "color": "red", "value": 0.5 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(financial_transfer_execution_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p95 Latencia"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(financial_transfer_execution_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p50 Latencia"
+        }
+      ]
+    },
+    {
+      "title": "Colisiones de Bloqueo Pesimista (Deadlocks BD)",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(financial_database_deadlocks_total) || 0",
+          "legendFormat": "Total Deadlocks"
+        }
+      ]
+    },
+    {
+      "title": "Eventos Outbox Publicados a NATS",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "targets": [
+        {
+          "expr": "sum(rate(financial_outbox_events_total[1m])) by (status)",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    },
+    {
+      "title": "Evaluaciones de Riesgo e IA por Modelo",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "targets": [
+        {
+          "expr": "sum(rate(financial_ai_evaluations_total[1m])) by (recommendation, model)",
+          "legendFormat": "{{recommendation}} ({{model}})"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["smartbancs", "observability", "financial"],
+  "time": { "from": "now-15m", "to": "now" },
+  "title": "SmartBancs Platform Observability",
+  "uid": "smartbancs-main-dashboard"
+}

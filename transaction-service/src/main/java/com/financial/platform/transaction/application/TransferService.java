@@ -14,6 +14,7 @@ import com.financial.platform.transaction.infrastructure.IdempotencyRepository;
 import com.financial.platform.transaction.infrastructure.LedgerJdbcRepository;
 import com.financial.platform.transaction.infrastructure.OutboxJdbcRepository;
 import com.financial.platform.transaction.infrastructure.TransactionJdbcRepository;
+import com.financial.platform.shared.observability.TransactionMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.CannotAcquireLockException;
@@ -35,6 +36,7 @@ public class TransferService {
     private final LedgerJdbcRepository ledgerRepository;
     private final OutboxJdbcRepository outboxRepository;
     private final IdempotencyRepository idempotencyRepository;
+    private final TransactionMetrics metrics;
 
     public TransferService(
         TransactionTemplate transactionTemplate,
@@ -42,7 +44,8 @@ public class TransferService {
         TransactionJdbcRepository transactionRepository,
         LedgerJdbcRepository ledgerRepository,
         OutboxJdbcRepository outboxRepository,
-        IdempotencyRepository idempotencyRepository
+        IdempotencyRepository idempotencyRepository,
+        TransactionMetrics metrics
     ) {
         this.transactionTemplate = transactionTemplate;
         this.accountRepository = accountRepository;
@@ -50,19 +53,23 @@ public class TransferService {
         this.ledgerRepository = ledgerRepository;
         this.outboxRepository = outboxRepository;
         this.idempotencyRepository = idempotencyRepository;
+        this.metrics = metrics;
     }
 
     public TransferResponse executeTransfer(String idempotencyKey, TransferRequest request) {
-        if (idempotencyKey == null || idempotencyKey.isBlank()) {
-            throw new IllegalArgumentException("El header Idempotency-Key es obligatorio");
-        }
+        long startTime = System.currentTimeMillis();
+        try {
+            if (idempotencyKey == null || idempotencyKey.isBlank()) {
+                throw new IllegalArgumentException("El header Idempotency-Key es obligatorio");
+            }
 
-        // 1. Verificación previa de idempotencia (Fast path)
-        Optional<Transaction> existingTransaction = idempotencyRepository.findTransactionByKey(idempotencyKey);
-        if (existingTransaction.isPresent()) {
-            log.info("Solicitud idempotente detectada para clave {}. Retornando transacción existente {}", idempotencyKey, existingTransaction.get().id());
-            return TransferResponse.from(existingTransaction.get(), true);
-        }
+            // 1. Verificación previa de idempotencia (Fast path)
+            Optional<Transaction> existingTransaction = idempotencyRepository.findTransactionByKey(idempotencyKey);
+            if (existingTransaction.isPresent()) {
+                log.info("Solicitud idempotente detectada para clave {}. Retornando transacción existente {}", idempotencyKey, existingTransaction.get().id());
+                metrics.registerIdempotentResponse();
+                return TransferResponse.from(existingTransaction.get(), true);
+            }
 
         if (request.sourceAccountId().equals(request.destinationAccountId())) {
             throw new SameAccountTransferException("La cuenta de origen y destino no pueden ser la misma");
@@ -139,6 +146,9 @@ public class TransferService {
 
             log.info("Transferencia exitosa {} de {} a {} por valor de {} {}",
                 transactionId, sourceAccount.id(), destinationAccount.id(), request.amount(), request.currency());
+
+            metrics.registerSuccessfulTransfer();
+            metrics.recordTransferDuration(System.currentTimeMillis() - startTime);
 
             return TransferResponse.from(transaction, false);
         });

@@ -1,6 +1,6 @@
 package com.financial.platform.ai.application;
 
-import com.financial.platform.ai.infrastructure.RecommendationJdbcRepository;
+import com.financial.platform.shared.observability.TransactionMetrics;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import jakarta.annotation.PostConstruct;
@@ -34,14 +34,17 @@ public class AiRecommendationWorker {
     private final Connection natsConnection;
     private final RecommendationJdbcRepository recommendationRepository;
     private final RestTemplate restTemplate;
+    private final TransactionMetrics metrics;
 
     public AiRecommendationWorker(
         @Autowired(required = false) Connection natsConnection,
-        RecommendationJdbcRepository recommendationRepository
+        RecommendationJdbcRepository recommendationRepository,
+        TransactionMetrics metrics
     ) {
         this.natsConnection = natsConnection;
         this.recommendationRepository = recommendationRepository;
         this.restTemplate = new RestTemplate();
+        this.metrics = metrics;
     }
 
     @PostConstruct
@@ -97,6 +100,7 @@ public class AiRecommendationWorker {
                 String modelVersion = (String) response.get("model_version");
 
                 recommendationRepository.save(transactionId, riskScore, recommendation, modelVersion);
+                metrics.registerAiEvaluation(recommendation, modelVersion);
                 log.info("Recomendación de IA guardada en PostgreSQL: TransactionId={}, Score={}, Rec={}, Model={}",
                     transactionId, riskScore, recommendation, modelVersion);
 

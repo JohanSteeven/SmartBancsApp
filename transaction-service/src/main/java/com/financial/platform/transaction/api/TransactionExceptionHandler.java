@@ -18,12 +18,31 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.financial.platform.shared.observability.TransactionMetrics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.DeadlockLoserDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 import java.util.List;
 
 @RestControllerAdvice
 public class TransactionExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionExceptionHandler.class);
+
+    private final TransactionMetrics metrics;
+
+    public TransactionExceptionHandler(TransactionMetrics metrics) {
+        this.metrics = metrics;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
@@ -51,6 +70,7 @@ public class TransactionExceptionHandler {
 
     @ExceptionHandler({SameAccountTransferException.class, CurrencyMismatchException.class, IllegalArgumentException.class})
     public ResponseEntity<ApiErrorResponse> handleBadRequest(Exception ex) {
+        metrics.registerRejectedTransfer("BAD_REQUEST");
         ApiErrorResponse body = ApiErrorResponse.of(
             HttpStatus.BAD_REQUEST.value(),
             "BAD_REQUEST",
@@ -61,6 +81,7 @@ public class TransactionExceptionHandler {
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(AccountNotFoundException ex) {
+        metrics.registerRejectedTransfer("ACCOUNT_NOT_FOUND");
         ApiErrorResponse body = ApiErrorResponse.of(
             HttpStatus.NOT_FOUND.value(),
             "ACCOUNT_NOT_FOUND",
@@ -71,6 +92,7 @@ public class TransactionExceptionHandler {
 
     @ExceptionHandler({InsufficientBalanceException.class, AccountInactiveException.class})
     public ResponseEntity<ApiErrorResponse> handleUnprocessable(TransferBusinessException ex) {
+        metrics.registerRejectedTransfer(ex.getClass().getSimpleName());
         ApiErrorResponse body = ApiErrorResponse.of(
             HttpStatus.UNPROCESSABLE_ENTITY.value(),
             "BUSINESS_RULE_VIOLATION",
@@ -81,6 +103,7 @@ public class TransactionExceptionHandler {
 
     @ExceptionHandler({CannotAcquireLockException.class, DeadlockLoserDataAccessException.class})
     public ResponseEntity<ApiErrorResponse> handleConcurrency(Exception ex) {
+        metrics.registerDeadlock();
         log.warn("Conflicto de concurrencia en la base de datos: {}", ex.getMessage());
         ApiErrorResponse body = ApiErrorResponse.of(
             HttpStatus.CONFLICT.value(),
