@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartBancs - Demo</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #070913;
+            --bg-card: rgba(18, 24, 40, 0.75);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(99, 102, 241, 0.3);
+            --primary: #6366f1;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+            --accent-cyan: #06b6d4;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .brand-font {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 28px;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            margin-bottom: 24px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            width: 46px;
+            height: 46px;
+            background: var(--primary-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: white;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .services-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .service-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-card);
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .service-badge:hover {
+            border-color: var(--primary);
+            color: white;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        /* GRID LAYOUT */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        /* ACCOUNTS GRID */
+        .accounts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .accounts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .account-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 18px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .account-card:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+        }
+
+        .account-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .account-id {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: monospace;
+            margin-bottom: 12px;
+            word-break: break-all;
+        }
+
+        .account-balance {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .account-currency {
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        /* FORM ELEMENTS */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border: 1px solid var(--border-card);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
+        }
+
+        .btn-danger:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* CONCURRENCY SIMULATOR */
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-gradient);
+            border-radius: 10px;
+            transition: width 0.2s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* RESPONSE CONSOLE */
+        .response-console {
+            background: #04060d;
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 16px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            color: #a5b4fc;
+            max-height: 260px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 16px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-amber {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-cyan {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .log-list {
+            list-style: none;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-card);
+            font-size: 13px;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-building-columns"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>SmartBancs</h1>
+                    <p>Core Platform & Observability Console</p>
+                </div>
+            </div>
+            <div class="services-bar">
+                <span class="service-badge">
+                    <div class="status-dot"></div> Core API (8080)
+                </span>
+                <span class="service-badge">
+                    <div class="status-dot"></div> Gemini AI (8000)
+                </span>
+                <span class="service-badge">
+                    <div class="status-dot"></div> NATS JetStream (4222)
+                </span>
+                <a href="http://localhost:3000" target="_blank" class="service-badge"><i
+                        class="fa-solid fa-chart-line"></i> Grafana (3000)</a>
+                <a href="http://localhost:9090" target="_blank" class="service-badge"><i class="fa-solid fa-fire"></i>
+                    Prometheus (9090)</a>
+                <a href="http://localhost:8080/swagger-ui.html" target="_blank" class="service-badge"><i
+                        class="fa-solid fa-code"></i> Swagger Docs</a>
+            </div>
+        </header>
+
+        <!-- LIVE ACCOUNTS BAR -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fa-solid fa-wallet"></i> Cuentas Bancarias y Saldos en Tiempo Real
+                </div>
+                <button class="btn btn-secondary" onclick="fetchAccountBalances()">
+                    <i class="fa-solid fa-rotate" id="refresh-icon"></i> Actualizar Saldos
+                </button>
+            </div>
+            <div class="accounts-grid">
+                <div class="account-card" id="card-acc-1001">
+                    <div class="account-number">
+                        <span>ACC-1001 (Origen Principal)</span>
+                        <span class="account-currency">USD</span>
+                    </div>
+                    <div class="account-id">a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11</div>
+                    <div class="account-balance" id="balance-acc-1001">$1,000.00</div>
+                    <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Activa</span>
+                </div>
+
+                <div class="account-card" id="card-acc-1002">
+                    <div class="account-number">
+                        <span>ACC-1002 (Destino A)</span>
+                        <span class="account-currency">USD</span>
+                    </div>
+                    <div class="account-id">b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22</div>
+                    <div class="account-balance" id="balance-acc-1002">$500.00</div>
+                    <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Activa</span>
+                </div>
+
+                <div class="account-card" id="card-acc-1003">
+                    <div class="account-number">
+                        <span>ACC-1003 (Destino B)</span>
+                        <span class="account-currency">USD</span>
+                    </div>
+                    <div class="account-id">c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33</div>
+                    <div class="account-balance" id="balance-acc-1003">$2,500.00</div>
+                    <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Activa</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD GRID -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT: TRANSFER FORM -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-money-bill-transfer"></i> Ejecución de Transferencia Atómica
+                    </div>
+                    <span class="badge badge-cyan"><i class="fa-solid fa-shield"></i> Idempotente</span>
+                </div>
+
+                <form id="transfer-form" onsubmit="executeSingleTransfer(event)">
+                    <div class="form-group">
+                        <label class="form-label">Cuenta Origen</label>
+                        <select class="form-control" id="sourceAccountId">
+                            <option value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11">ACC-1001 (a0eebc99-9c0b-4ef8...)
+                            </option>
+                            <option value="b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22">ACC-1002 (b0eebc99-9c0b-4ef8...)
+                            </option>
+                            <option value="c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33">ACC-1003 (c0eebc99-9c0b-4ef8...)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Cuenta Destino</label>
+                        <select class="form-control" id="destinationAccountId">
+                            <option value="b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22">ACC-1002 (b0eebc99-9c0b-4ef8...)
+                            </option>
+                            <option value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11">ACC-1001 (a0eebc99-9c0b-4ef8...)
+                            </option>
+                            <option value="c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33">ACC-1003 (c0eebc99-9c0b-4ef8...)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Monto a Transferir (USD)</label>
+                        <input type="number" step="0.01" class="form-control" id="transferAmount" value="100.00"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Clave de Idempotencia (Idempotency-Key)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="idempotencyKey" required>
+                            <button type="button" class="btn btn-secondary" onclick="generateNewUUID()">
+                                <i class="fa-solid fa-key"></i> Nuevo UUID
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-paper-plane"></i> Procesar Transferencia Atómica
+                    </button>
+                </form>
+
+                <div class="card-header" style="margin-top: 24px; margin-bottom: 10px; padding-bottom: 8px;">
+                    <div class="card-title" style="font-size: 14px;">
+                        <i class="fa-solid fa-terminal"></i> Consola de Respuesta API & Recomendación IA
+                    </div>
+                    <span id="response-status-badge"></span>
+                </div>
+                <div class="response-console" id="single-response-console">// Esperando ejecución de transferencia...
+                </div>
+            </div>
+
+            <!-- RIGHT: CONCURRENCY SIMULATOR & AI FEED -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-bolt"></i> Simulador de Concurrencia (Ráfaga de Estrés)
+                    </div>
+                    <span class="badge badge-amber"><i class="fa-solid fa-lock"></i> Row Locks pesimistas</span>
+                </div>
+
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                    Simula ráfagas de transacciones simultáneas contra la misma cuenta origen para probar el control de
+                    saldo sin sobregiros y la prevención de deadlocks.
+                </p>
+
+                <div class="form-group">
+                    <label class="form-label">Peticiones Simultáneas (VUs): <span
+                            id="vu-count-display">10</span></label>
+                    <input type="range" min="2" max="20" value="10" class="form-control" id="vuCount"
+                        oninput="document.getElementById('vu-count-display').innerText = this.value">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Monto por Petición (USD)</label>
+                    <input type="number" step="0.01" class="form-control" id="burstAmount" value="200.00">
+                </div>
+
+                <button type="button" class="btn btn-danger btn-block" onclick="runConcurrencySimulation()">
+                    <i class="fa-solid fa-rocket"></i> Lanzar Ráfaga Concurrente (10 solicitudes)
+                </button>
+
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="sim-progress-bar"></div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" style="color: var(--accent-green);" id="stat-201">0</div>
+                        <div class="stat-label">Éxito (201)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" style="color: var(--accent-amber);" id="stat-422">0</div>
+                        <div class="stat-label">Rechazado (422)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" style="color: var(--accent-red);" id="stat-errors">0</div>
+                        <div class="stat-label">Errores</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" style="color: var(--accent-cyan);" id="stat-latency">0 ms</div>
+                        <div class="stat-label">Latencia Prom.</div>
+                    </div>
+                </div>
+
+                <div class="card-header" style="margin-top: 24px; margin-bottom: 10px; padding-bottom: 8px;">
+                    <div class="card-title" style="font-size: 14px;">
+                        <i class="fa-solid fa-list-check"></i> Historial Reciente y Evaluaciones de IA
+                    </div>
+                </div>
+
+                <ul class="log-list" id="transaction-log-list">
+                    <li class="log-item" style="color: var(--text-muted); justify-content: center;">Sin transacciones
+                        ejecutadas en esta sesión</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1';
+
+        // Generar UUID v4
+        function cryptoUUID() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
+
+        function generateNewUUID() {
+            document.getElementById('idempotencyKey').value = cryptoUUID();
+        }
+
+        // Inicialización
+        window.addEventListener('DOMContentLoaded', () => {
+            generateNewUUID();
+            fetchAccountBalances();
+        });
+
+        // Consultar saldos de cuentas
+        async function fetchAccountBalances() {
+            const refreshIcon = document.getElementById('refresh-icon');
+            refreshIcon.classList.add('spinner');
+
+            const accountIds = [
+                { id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', elementId: 'balance-acc-1001' },
+                { id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', elementId: 'balance-acc-1002' },
+                { id: 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', elementId: 'balance-acc-1003' }
+            ];
+
+            for (const acc of accountIds) {
+                try {
+                    const res = await fetch(`${API_BASE}/accounts/${acc.id}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        document.getElementById(acc.elementId).innerText = `$${parseFloat(data.balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    }
+                } catch (err) {
+                    console.error('Error fetching account balance:', err);
+                }
+            }
+
+            setTimeout(() => refreshIcon.classList.remove('spinner'), 600);
+        }
+
+        // Ejecutar Transferencia Individual
+        async function executeSingleTransfer(e) {
+            e.preventDefault();
+
+            const sourceAccountId = document.getElementById('sourceAccountId').value;
+            const destinationAccountId = document.getElementById('destinationAccountId').value;
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+            const idempotencyKey = document.getElementById('idempotencyKey').value;
+
+            if (sourceAccountId === destinationAccountId) {
+                alert('La cuenta de origen y destino no pueden ser la misma.');
+                return;
+            }
+
+            const consoleElem = document.getElementById('single-response-console');
+            const badgeElem = document.getElementById('response-status-badge');
+            consoleElem.innerText = '// Enviando petición atómica a Spring Boot transaction-service...';
+            badgeElem.innerHTML = '<span class="badge badge-amber"><i class="fa-solid fa-spinner spinner"></i> Procesando</span>';
+
+            const startTime = performance.now();
+
+            try {
+                const response = await fetch(`${API_BASE}/transactions/transfers`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Idempotency-Key': idempotencyKey
+                    },
+                    body: JSON.stringify({
+                        sourceAccountId,
+                        destinationAccountId,
+                        amount,
+                        currency: 'USD'
+                    })
+                });
+
+                const elapsed = Math.round(performance.now() - startTime);
+                const data = await response.json();
+
+                if (response.ok) {
+                    badgeElem.innerHTML = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> ${response.status} CREATED (${elapsed} ms)</span>`;
+                    consoleElem.innerText = JSON.stringify(data, null, 2);
+
+                    // Intentar obtener recomendación IA asíncrona
+                    fetchAiRecommendation(data.transactionId);
+                    addLogItem(data.transactionId, amount, 'COMPLETED', elapsed);
+                } else {
+                    badgeElem.innerHTML = `<span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> ${response.status} REJECTED (${elapsed} ms)</span>`;
+                    consoleElem.innerText = JSON.stringify(data, null, 2);
+                    addLogItem(data.transactionId || 'REJECTED', amount, 'REJECTED', elapsed);
+                }
+
+                // Actualizar saldos en pantalla
+                fetchAccountBalances();
+
+            } catch (err) {
+                badgeElem.innerHTML = '<span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> ERROR CONEXIÓN</span>';
+                consoleElem.innerText = `Error al conectar con la API: ${err.message}`;
+            }
+        }
+
+        // Consultar recomendación de IA para una transacción
+        async function fetchAiRecommendation(txId) {
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(`${API_BASE}/recommendations/${txId}`);
+                    if (res.ok) {
+                        const rec = await res.json();
+                        const consoleElem = document.getElementById('single-response-console');
+                        consoleElem.innerText += `\n\n// EVALUACIÓN GEMINI AI COMPLETED:\n` + JSON.stringify(rec, null, 2);
+                    }
+                } catch (err) {
+                    console.log('IA evaluation pending or skipped');
+                }
+            }, 1200);
+        }
+
+        // Agregar ítem al historial visual
+        function addLogItem(txId, amount, status, elapsed) {
+            const list = document.getElementById('transaction-log-list');
+            if (list.children.length === 1 && list.children[0].innerText.includes('Sin transacciones')) {
+                list.innerHTML = '';
+            }
+
+            const li = document.createElement('li');
+            li.className = 'log-item';
+            const isSuccess = status === 'COMPLETED';
+            const shortId = typeof txId === 'string' ? txId.substring(0, 8) + '...' : 'TX';
+
+            li.innerHTML = `
+            <div>
+                <strong>$${parseFloat(amount).toFixed(2)} USD</strong> 
+                <span style="color: var(--text-muted); font-size: 11px; margin-left: 8px;">ID: ${shortId}</span>
+            </div>
+            <div>
+                <span class="badge ${isSuccess ? 'badge-success' : 'badge-amber'}">${status}</span>
+                <span style="color: var(--text-muted); font-size: 11px; margin-left: 6px;">${elapsed} ms</span>
+            </div>
+        `;
+
+            list.prepend(li);
+        }
+
+        // Ráfaga Concurrente de Estrés
+        async function runConcurrencySimulation() {
+            const vuCount = parseInt(document.getElementById('vuCount').value);
+            const amount = parseFloat(document.getElementById('burstAmount').value);
+            const sourceAccountId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'; // ACC-1001
+            const destinationAccountId = 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22'; // ACC-1002
+
+            document.getElementById('stat-201').innerText = '0';
+            document.getElementById('stat-422').innerText = '0';
+            document.getElementById('stat-errors').innerText = '0';
+            document.getElementById('stat-latency').innerText = '0 ms';
+            document.getElementById('sim-progress-bar').style.width = '0%';
+
+            let count201 = 0;
+            let count422 = 0;
+            let countErrors = 0;
+            let totalLatency = 0;
+
+            const promises = [];
+            const startTime = performance.now();
+
+            for (let i = 0; i < vuCount; i++) {
+                const key = `sim-${cryptoUUID()}`;
+
+                const p = (async () => {
+                    const reqStart = performance.now();
+                    try {
+                        const res = await fetch(`${API_BASE}/transactions/transfers`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Idempotency-Key': key
+                            },
+                            body: JSON.stringify({
+                                sourceAccountId,
+                                destinationAccountId,
+                                amount,
+                                currency: 'USD'
+                            })
+                        });
+
+                        const elapsed = performance.now() - reqStart;
+                        totalLatency += elapsed;
+
+                        if (res.status === 201) count201++;
+                        else if (res.status === 422) count422++;
+                        else countErrors++;
+
+                    } catch (err) {
+                        countErrors++;
+                    }
+
+                    // Actualizar progreso
+                    const completed = count201 + count422 + countErrors;
+                    document.getElementById('sim-progress-bar').style.width = `${(completed / vuCount) * 100}%`;
+                    document.getElementById('stat-201').innerText = count201;
+                    document.getElementById('stat-422').innerText = count422;
+                    document.getElementById('stat-errors').innerText = countErrors;
+                    document.getElementById('stat-latency').innerText = `${Math.round(totalLatency / (completed || 1))} ms`;
+                })();
+
+                promises.push(p);
+            }
+
+            await Promise.all(promises);
+            fetchAccountBalances();
+        }
+    </script>
+
+</body>
+
+</html>
