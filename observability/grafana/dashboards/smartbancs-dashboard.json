@@ -41,11 +41,11 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(financial_transfer_execution_seconds_bucket[1m])) by (le))",
+          "expr": "financial_transfer_execution_seconds{quantile=\"0.95\"}",
           "legendFormat": "p95 Latencia"
         },
         {
-          "expr": "histogram_quantile(0.50, sum(rate(financial_transfer_execution_seconds_bucket[1m])) by (le))",
+          "expr": "financial_transfer_execution_seconds{quantile=\"0.5\"}",
           "legendFormat": "p50 Latencia"
         }
       ]
@@ -68,7 +68,7 @@
       },
       "targets": [
         {
-          "expr": "sum(financial_database_deadlocks_total) || 0",
+          "expr": "sum(financial_database_deadlocks_total) or vector(0)",
           "legendFormat": "Total Deadlocks"
         }
       ]
