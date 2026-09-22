@@ -1,0 +1,24 @@
+# Archivos de entorno y credenciales sensibles
+.env
+*.env.local
+
+# Archivos de compilación Java / Maven
+**/target/
+*.class
+*.jar
+*.war
+
+# Archivos de Python / Bytecode
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+
+# Archivos de IDE y sistema operativo
+.idea/
+.vscode/
+*.swp
+*.DS_Store
+Thumbs.db
